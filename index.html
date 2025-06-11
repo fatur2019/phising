@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Area</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3498db, #8e44ad); /* Gradien biru ke ungu */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #fff; /* Warna teks putih */
+            overflow: hidden; /* Mencegah scrolling saat overlay aktif */
+        }
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.1); /* Latar belakang putih transparan */
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 80%; /* Lebar responsif */
+            max-width: 400px; /* Lebar maksimum */
+        }
+        h2 {
+            color: #fff;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #eee;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        input::placeholder {
+            color: #ccc;
+        }
+        button {
+            padding: 14px 30px;
+            background-color: #2ecc71; /* Hijau cerah */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        button:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        #error-message {
+            color: #e74c3c; /* Merah */
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+        #success-message {
+            color: #2ecc71; /* Hijau */
+            margin-top: 20px;
+            font-size: 0.9em;
+        }
+
+        /* --- Gaya untuk Overlay Offline --- */
+        #offline-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9); /* Latar belakang gelap transparan */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Pastikan di atas semua elemen lain */
+            flex-direction: column;
+            color: white;
+            font-size: 1.5em;
+            text-align: center;
+            padding: 20px;
+        }
+        #offline-overlay p {
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        #offline-overlay .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #3498db; /* Warna spinner */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Awalnya sembunyikan overlay, hanya tampilkan jika offline */
+        #offline-overlay:not(.active) {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="offline-overlay">
+        <p>Kamu sedang offline.</p>
+        <p>Mohon periksa koneksi internetmu.</p>
+        <div class="spinner"></div>
+    </div>
+
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="login-form">
+            <div class="input-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" placeholder="Masukkan username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" placeholder="Masukkan password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p id="error-message"></p>
+        <p id="success-message" style="display: none;">Login Berhasil. Mengarahkan...</p>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+        const offlineOverlay = document.getElementById('offline-overlay');
+
+        const correctUsername = "fatur";
+        const correctPassword = "anjai";
+
+        // Fungsi untuk menampilkan overlay offline
+        function showOfflineOverlay() {
+            offlineOverlay.classList.add('active'); // Tambahkan class 'active' untuk menampilkan
+            document.body.style.overflow = 'hidden'; // Nonaktifkan scrolling
+        }
+
+        // Fungsi untuk menyembunyikan overlay offline
+        function hideOfflineOverlay() {
+            offlineOverlay.classList.remove('active'); // Hapus class 'active' untuk menyembunyikan
+            document.body.style.overflow = 'auto'; // Aktifkan kembali scrolling
+        }
+
+        // Cek status koneksi saat halaman dimuat
+        if (!navigator.onLine) {
+            showOfflineOverlay();
+        }
+
+        // Tambahkan event listener untuk mendeteksi perubahan status koneksi
+        window.addEventListener('offline', showOfflineOverlay);
+        window.addEventListener('online', hideOfflineOverlay);
+
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Selalu cek koneksi saat submit, meskipun overlay sudah ada
+            if (!navigator.onLine) {
+                // Overlay sudah tampil, jadi tidak perlu tindakan lebih lanjut selain mencegah submit
+                errorMessage.textContent = "";
+                successMessage.style.display = 'none';
+                return; // Hentikan proses login jika offline
+            }
+
+            const enteredUsername = usernameInput.value;
+            const enteredPassword = passwordInput.value;
+
+            if (enteredUsername === correctUsername && enteredPassword === correctPassword) {
+                errorMessage.textContent = "";
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = 'isi.html';
+                }, 1500);
+            } else {
+                successMessage.style.display = 'none';
+                errorMessage.textContent = "Username atau password salah.";
+            }
+        });
+    </script>
+</body>
+</html>
